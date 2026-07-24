@@ -46,7 +46,7 @@ const INITIAL_VIEW_STATE: MapViewState = {
   bearing: 0
 };
 
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json';
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json';
 
 export const colorRange: Color[] = [
   [1, 152, 189],
