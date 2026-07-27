@@ -248,6 +248,7 @@ export default function App() {
   const [heatmapMode, setHeatmapMode] = useState('signal');
   const [filterSSID, setFilterSSID] = useState('');
   const [filterEncryption, setFilterEncryption] = useState('All');
+  const [theme, setTheme] = useState('dark');
   const [securityFilter, setSecurityFilter] = useState('All');
   const [signalBand, setSignalBand] = useState('All');
   const [minSignal, setMinSignal] = useState(SIGNAL_MIN);
@@ -304,7 +305,6 @@ export default function App() {
     link.href = 'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap';
     document.head.appendChild(link);
     document.body.style.margin = '0';
-    document.body.style.background = '#040814';
     document.body.style.fontFamily = 'Roboto Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
     document.body.style.overflow = 'hidden';
 
@@ -317,7 +317,44 @@ export default function App() {
     };
   }, [loadWifiData]);
 
+  useEffect(() => {
+    document.body.style.background = theme === 'light' ? '#f8fafc' : '#040814';
+    document.body.style.color = theme === 'light' ? '#0f172a' : '#e0f7ff';
+  }, [theme]);
+
   const autoRotateActive = autoRotateEnabled && !userInteracted;
+  const isLightMode = theme === 'light';
+  const mapStyleUrl = isLightMode ? 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json' : MAP_STYLE;
+  const themePanelBackground = isLightMode
+    ? 'linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.96))'
+    : 'linear-gradient(180deg, rgba(10, 15, 28, 0.96), rgba(4, 9, 18, 0.96))';
+  const themePanelBorder = isLightMode ? '1px solid rgba(148, 163, 184, 0.45)' : '1px solid rgba(56, 189, 248, 0.42)';
+  const themeTextColor = isLightMode ? '#0f172a' : '#e0f7ff';
+  const themeInputBackground = isLightMode ? 'rgba(255,255,255,0.95)' : 'rgba(15, 23, 42, 0.92)';
+  const themeInputBorder = isLightMode ? '1px solid rgba(148, 163, 184, 0.45)' : '1px solid rgba(56, 189, 248, 0.45)';
+  const themeLegendBackground = isLightMode ? 'rgba(255,255,255,0.94)' : 'rgba(5, 10, 22, 0.96)';
+  const themeLegendBorder = isLightMode ? '1px solid rgba(148, 163, 184, 0.35)' : '1px solid rgba(56, 189, 248, 0.28)';
+  const themeLabelColor = isLightMode ? '#475569' : '#9fd8ff';
+  const themeAccent = isLightMode ? '#2563eb' : '#7dd3fc';
+  const themeCaptionColor = isLightMode ? '#64748b' : '#94a3b8';
+  const themeButtonText = isLightMode ? '#0f172a' : '#e0f7ff';
+  const themedInputStyle = {
+    ...inputStyle,
+    background: themeInputBackground,
+    border: themeInputBorder,
+    color: themeTextColor
+  };
+  const themedLegendStyle = {
+    ...legendStyle,
+    background: themeLegendBackground,
+    border: themeLegendBorder,
+    color: themeTextColor
+  };
+
+  const themedLabelStyle = {
+    ...labelStyle,
+    color: themeLabelColor
+  };
 
   useEffect(() => {
     if (!autoRotateActive) {
@@ -631,14 +668,13 @@ export default function App() {
           };
         }}
       >
-        <Map mapLib={maplibregl} mapStyle={MAP_STYLE} />
+        <Map mapLib={maplibregl} mapStyle={mapStyleUrl} />
       </DeckGL>
 
-      <div style={leftPanelStyle}>
+      <div style={{...leftPanelStyle, background: themePanelBackground, border: themePanelBorder, color: themeTextColor}}>
         <div style={{display: 'grid', gap: 14}}>
-          <div style={{fontSize: 20, fontWeight: 800, color: '#7dd3fc', letterSpacing: '0.08em'}}>Wi-Fi Map Boston</div>
-          <div style={{fontSize: 12, color: '#94a3b8', lineHeight: 1.6}}>Live refresh every 30 seconds. Explore signal strength, network density, and encryption in a cyber grid.</div>
-        </div>
+            <div style={{fontSize: 20, fontWeight: 800, color: themeAccent, letterSpacing: '0.08em'}}>Wi-Fi Map Boston</div>
+            <div style={{fontSize: 12, color: themeCaptionColor, lineHeight: 1.6}}>Live refresh every 30 seconds. Explore signal strength, network density, and encryption in a cyber grid.</div>
 
         <div style={{...sectionStyle, overflow: 'hidden', display: 'grid', gap: 16}}>
             <div style={{display: 'grid', gap: 12}}>
@@ -649,17 +685,40 @@ export default function App() {
                 cursor: 'pointer',
                 width: '100%',
                 borderRadius: 18,
-                border: '1px solid rgba(56, 189, 248, 0.9)',
-                background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.22), rgba(56, 189, 248, 0.14))',
-                color: '#e0f7ff',
+                border: isLightMode ? '1px solid rgba(148, 163, 184, 0.8)' : '1px solid rgba(56, 189, 248, 0.9)',
+                background: isLightMode
+                  ? 'linear-gradient(135deg, rgba(203, 213, 225, 0.25), rgba(148, 163, 184, 0.16))'
+                  : 'linear-gradient(135deg, rgba(14, 165, 233, 0.22), rgba(56, 189, 248, 0.14))',
+                color: themeButtonText,
                 padding: '14px 18px',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                boxShadow: '0 16px 40px rgba(14, 165, 233, 0.18)'
+                boxShadow: isLightMode ? '0 16px 40px rgba(148, 163, 184, 0.12)' : '0 16px 40px rgba(14, 165, 233, 0.18)'
               }}
             >
               Reset camera
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))}
+              style={{
+                cursor: 'pointer',
+                width: '100%',
+                borderRadius: 18,
+                border: isLightMode ? '1px solid rgba(99,102,241,0.8)' : '1px solid rgba(34, 211, 238, 0.9)',
+                background: isLightMode
+                  ? 'linear-gradient(135deg, rgba(59,130,246,0.15), rgba(37,99,235,0.14))'
+                  : 'linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(56, 189, 248, 0.12))',
+                color: themeButtonText,
+                padding: '14px 18px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                boxShadow: isLightMode ? '0 16px 40px rgba(59,130,246,0.1)' : '0 16px 40px rgba(34, 211, 238, 0.16)'
+              }}
+            >
+              {isLightMode ? 'Dark mode' : 'Light mode'}
             </button>
             <button
               type="button"
@@ -668,14 +727,16 @@ export default function App() {
                 cursor: 'pointer',
                 width: '100%',
                 borderRadius: 18,
-                border: '1px solid rgba(34, 211, 238, 0.9)',
-                background: 'linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(56, 189, 248, 0.12))',
-                color: '#e0f7ff',
+                border: isLightMode ? '1px solid rgba(148, 163, 184, 0.8)' : '1px solid rgba(34, 211, 238, 0.9)',
+                background: isLightMode
+                  ? 'linear-gradient(135deg, rgba(203, 213, 225, 0.18), rgba(148, 163, 184, 0.12))'
+                  : 'linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(56, 189, 248, 0.12))',
+                color: themeButtonText,
                 padding: '14px 18px',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                boxShadow: '0 16px 40px rgba(34, 211, 238, 0.16)'
+                boxShadow: isLightMode ? '0 16px 40px rgba(148, 163, 184, 0.12)' : '0 16px 40px rgba(34, 211, 238, 0.16)'
               }}
             >
               {autoRotateEnabled ? 'Pause spin' : 'Resume spin'}
@@ -685,7 +746,7 @@ export default function App() {
             </div>
           </div>
 
-          <label style={labelStyle}>
+          <label style={themedLabelStyle}>
             <span>Show Wi-Fi layer</span>
             <input
               type="checkbox"
@@ -694,7 +755,7 @@ export default function App() {
             />
           </label>
 
-          <label style={labelStyle}>
+          <label style={themedLabelStyle}>
             <span>Show heatmap overlay</span>
             <input
               type="checkbox"
@@ -703,36 +764,36 @@ export default function App() {
             />
           </label>
 
-          <label style={labelStyle}>
+          <label style={themedLabelStyle}>
             <span>Heatmap mode</span>
             <select
               value={heatmapMode}
               onChange={evt => setHeatmapMode(evt.target.value)}
-              style={inputStyle}
+              style={themedInputStyle}
             >
               <option value="signal">Signal</option>
               <option value="density">Density</option>
             </select>
           </label>
 
-          <label style={labelStyle}>
+          <label style={themedLabelStyle}>
             <span>Base display mode</span>
             <select
               value={displayMode}
               onChange={evt => setDisplayMode(evt.target.value)}
-              style={inputStyle}
+              style={themedInputStyle}
             >
               <option value="signal">Signal</option>
               <option value="density">Density</option>
             </select>
           </label>
 
-          <label style={labelStyle}>
+          <label style={themedLabelStyle}>
             <span>Security filter</span>
             <select
               value={securityFilter}
               onChange={evt => setSecurityFilter(evt.target.value)}
-              style={inputStyle}
+              style={themedInputStyle}
             >
               <option value="All">All</option>
               <option value="Open">Open</option>
@@ -740,12 +801,12 @@ export default function App() {
             </select>
           </label>
 
-          <label style={labelStyle}>
+          <label style={themedLabelStyle}>
             <span>Signal band</span>
             <select
               value={signalBand}
               onChange={evt => setSignalBand(evt.target.value)}
-              style={inputStyle}
+              style={themedInputStyle}
             >
               <option value="All">All</option>
               <option value="Weak">Weak (&le; -75 dBm)</option>
@@ -754,7 +815,7 @@ export default function App() {
             </select>
           </label>
 
-          <label style={{...labelStyle, flexWrap: 'wrap', gap: 8}}>
+          <label style={{...themedLabelStyle, flexWrap: 'wrap', gap: 8}}>
               <span>Minimum signal</span>
               <span>{minSignal} dBm</span>
             </label>
@@ -764,10 +825,10 @@ export default function App() {
               max={SIGNAL_MAX}
               value={minSignal}
               onChange={evt => setMinSignal(Number(evt.target.value))}
-              style={{...inputStyle, marginBottom: 0}}
+              style={{...themedInputStyle, marginBottom: 0}}
             />
 
-            <label style={{...labelStyle, flexWrap: 'wrap', gap: 8}}>
+          <label style={{...themedLabelStyle, flexWrap: 'wrap', gap: 8}}>
               <span>Minimum networks</span>
               <span>{minNetworks}</span>
             </label>
@@ -777,23 +838,23 @@ export default function App() {
               max={Math.max(1, maxNetworkCount)}
               value={minNetworks}
               onChange={evt => setMinNetworks(Number(evt.target.value))}
-              style={{...inputStyle, marginBottom: 0}}
-          />
+              style={{...themedInputStyle, marginBottom: 0}}
+            />
 
-          <label style={labelStyle}>
+          <label style={themedLabelStyle}>
             <span>Encryption type</span>
           </label>
           <select
             value={filterEncryption}
             onChange={evt => setFilterEncryption(evt.target.value)}
-            style={inputStyle}
+            style={themedInputStyle}
           >
             {encryptionTypes.map(type => (
               <option key={type} value={type}>{type}</option>
             ))}
           </select>
 
-          <label style={labelStyle}>
+          <label style={themedLabelStyle}>
             <span>Search SSID</span>
           </label>
           <input
@@ -801,40 +862,41 @@ export default function App() {
             value={filterSSID}
             placeholder="SSID substring"
             onChange={evt => setFilterSSID(evt.target.value)}
-            style={inputStyle}
+            style={themedInputStyle}
           />
 
           <div style={{display: 'grid', gap: 8}}>
             {isLoading ? (
-              <div style={{color: '#60a5fa'}}>Loading data…</div>
+              <div style={{color: isLightMode ? '#2563eb' : '#60a5fa'}}>Loading data…</div>
             ) : error ? (
               <div style={{color: '#f87171'}}>Error: {error}</div>
             ) : (
-              <div style={{color: '#cbd5e1'}}>
+              <div style={{color: themeCaptionColor}}>
                 Loaded {wifiHexagons.length} hexagons, showing {filteredHexagons.length}.
               </div>
             )}
           </div>
         </div>
       </div>
+    </div>
 
-      <div style={rightPanelStyle}>
+      <div style={{...rightPanelStyle, background: themePanelBackground, border: themePanelBorder, color: themeTextColor}}>
         <div style={{display: 'grid', gap: 24}}>
-          <div style={{fontSize: 16, fontWeight: 800, color: '#7dd3fc', letterSpacing: '0.08em'}}>Dashboard</div>
+          <div style={{fontSize: 16, fontWeight: 800, color: isLightMode ? '#1d4ed8' : '#7dd3fc', letterSpacing: '0.08em'}}>Dashboard</div>
           {selectedHexagon ? (
-            <div style={{...legendStyle, borderColor: 'rgba(34, 211, 238, 0.6)', overflow: 'hidden'}}>
-              <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10, color: '#f8fafc'}}>Selected hexagon</div>
+            <div style={{...themedLegendStyle, borderColor: themeAccent, overflow: 'hidden'}}>
+              <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10, color: themeTextColor}}>Selected hexagon</div>
               <div style={{display: 'grid', gap: 10, overflow: 'hidden'}}>
-                <div style={{fontSize: 11, color: '#94a3b8'}}>Hexagon ID</div>
-                <div style={{fontSize: 14, color: '#e0f7ff', wordBreak: 'break-all'}}>{selectedHexagon.hex}</div>
-                <label style={{...labelStyle, color: '#94a3b8'}}>
+                <div style={{fontSize: 11, color: themeCaptionColor}}>Hexagon ID</div>
+                <div style={{fontSize: 14, color: themeTextColor, wordBreak: 'break-all'}}>{selectedHexagon.hex}</div>
+                <label style={{...labelStyle, color: themeCaptionColor}}>
                   <span style={{fontSize: 11}}>Network</span>
-                  <span style={{fontSize: 11, color: '#7dd3fc'}}>{selectedHexagon.networks.length}</span>
+                  <span style={{fontSize: 11, color: themeAccent}}>{selectedHexagon.networks.length}</span>
                 </label>
                 <select
                   value={selectedNetworkIndex}
                   onChange={evt => setSelectedNetworkIndex(Number(evt.target.value))}
-                  style={inputStyle}
+                  style={themedInputStyle}
                 >
                   {selectedHexagon.networks.map((network, index) => (
                     <option key={`${network.bssid}-${index}`} value={index}>
@@ -844,34 +906,34 @@ export default function App() {
                 </select>
                 {selectedNetwork ? (
                   <div style={{display: 'grid', gap: 6, padding: '12px 0'}}>
-                    <div style={{fontSize: 12, color: '#94a3b8'}}>BSSID</div>
-                    <div style={{fontSize: 14, color: '#e0f7ff'}}>{selectedNetwork.bssid}</div>
-                    <div style={{fontSize: 12, color: '#94a3b8'}}>Best signal</div>
-                    <div style={{fontSize: 14, color: '#e0f7ff'}}>{selectedNetwork['best signal']} dBm</div>
-                    <div style={{fontSize: 12, color: '#94a3b8'}}>Encryption</div>
-                    <div style={{fontSize: 14, color: '#e0f7ff'}}>{selectedNetwork.encryption || 'Unknown'}</div>
-                    <div style={{fontSize: 12, color: '#94a3b8'}}>Records</div>
-                    <div style={{fontSize: 14, color: '#e0f7ff'}}>{Array.isArray(selectedNetwork.records) ? selectedNetwork.records.length : 0}</div>
+                    <div style={{fontSize: 12, color: themeCaptionColor}}>BSSID</div>
+                    <div style={{fontSize: 14, color: themeTextColor}}>{selectedNetwork.bssid}</div>
+                    <div style={{fontSize: 12, color: themeCaptionColor}}>Best signal</div>
+                    <div style={{fontSize: 14, color: themeTextColor}}>{selectedNetwork['best signal']} dBm</div>
+                    <div style={{fontSize: 12, color: themeCaptionColor}}>Encryption</div>
+                    <div style={{fontSize: 14, color: themeTextColor}}>{selectedNetwork.encryption || 'Unknown'}</div>
+                    <div style={{fontSize: 12, color: themeCaptionColor}}>Records</div>
+                    <div style={{fontSize: 14, color: themeTextColor}}>{Array.isArray(selectedNetwork.records) ? selectedNetwork.records.length : 0}</div>
                   </div>
                 ) : null}
                 <div style={{display: 'grid', gap: 10, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.08)'}}>
                   <div style={{display: 'grid', gap: 4}}>
-                    <div style={{fontSize: 11, color: '#94a3b8'}}>Open / secure</div>
-                    <div style={{fontSize: 14, color: '#e0f7ff'}}>{selectedOpenCount} open · {selectedSecureCount} secure</div>
+                    <div style={{fontSize: 11, color: themeCaptionColor}}>Open / secure</div>
+                    <div style={{fontSize: 14, color: themeTextColor}}>{selectedOpenCount} open · {selectedSecureCount} secure</div>
                   </div>
                   <div style={{display: 'grid', gap: 4}}>
-                    <div style={{fontSize: 11, color: '#94a3b8'}}>Average signal</div>
-                    <div style={{fontSize: 14, color: '#e0f7ff'}}>{selectedHexagon.averageSignal ?? 'N/A'} dBm</div>
+                    <div style={{fontSize: 11, color: themeCaptionColor}}>Average signal</div>
+                    <div style={{fontSize: 14, color: themeTextColor}}>{selectedHexagon.averageSignal ?? 'N/A'} dBm</div>
                   </div>
                   <div style={{display: 'grid', gap: 4}}>
-                    <div style={{fontSize: 11, color: '#94a3b8'}}>Records</div>
-                    <div style={{fontSize: 14, color: '#e0f7ff'}}>{selectedHexagon.recordCount}</div>
+                    <div style={{fontSize: 11, color: themeCaptionColor}}>Records</div>
+                    <div style={{fontSize: 14, color: themeTextColor}}>{selectedHexagon.recordCount}</div>
                   </div>
                   <div style={{display: 'grid', gap: 4}}>
-                    <div style={{fontSize: 11, color: '#94a3b8'}}>Top SSIDs</div>
+                    <div style={{fontSize: 11, color: themeCaptionColor}}>Top SSIDs</div>
                     <div style={{display: 'grid', gap: 3}}>
                       {selectedHexagonSummary.map((network, index) => (
-                        <div key={`${network.bssid}-${index}`} style={{fontSize: 13, color: '#dbeafe'}}>
+                        <div key={`${network.bssid}-${index}`} style={{fontSize: 13, color: themeTextColor}}>
                           {network.ssid || '<hidden>'} · {network.encryption || 'Unknown'} · {network['best signal']} dBm
                         </div>
                       ))}
@@ -884,9 +946,9 @@ export default function App() {
                       style={{
                         width: '100%',
                         borderRadius: 14,
-                        border: '1px solid rgba(56, 189, 248, 0.75)',
-                        background: 'rgba(14, 165, 233, 0.14)',
-                        color: '#e0f7ff',
+                        border: isLightMode ? '1px solid rgba(37, 99, 235, 0.75)' : '1px solid rgba(56, 189, 248, 0.75)',
+                        background: isLightMode ? 'rgba(37, 99, 235, 0.12)' : 'rgba(14, 165, 233, 0.14)',
+                        color: themeButtonText,
                         padding: '12px 14px',
                         fontWeight: 700,
                         letterSpacing: '0.06em',
@@ -901,9 +963,9 @@ export default function App() {
                       style={{
                         width: '100%',
                         borderRadius: 14,
-                        border: '1px solid rgba(34, 211, 238, 0.75)',
-                        background: 'rgba(56, 189, 248, 0.12)',
-                        color: '#e0f7ff',
+                        border: isLightMode ? '1px solid rgba(37, 99, 235, 0.75)' : '1px solid rgba(34, 211, 238, 0.75)',
+                        background: isLightMode ? 'rgba(37, 99, 235, 0.08)' : 'rgba(56, 189, 248, 0.12)',
+                        color: themeButtonText,
                         padding: '12px 14px',
                         fontWeight: 700,
                         letterSpacing: '0.06em',
@@ -918,9 +980,9 @@ export default function App() {
                       style={{
                         width: '100%',
                         borderRadius: 14,
-                        border: '1px solid rgba(34, 211, 238, 0.75)',
-                        background: 'rgba(14, 165, 233, 0.12)',
-                        color: '#e0f7ff',
+                        border: isLightMode ? '1px solid rgba(37, 99, 235, 0.75)' : '1px solid rgba(34, 211, 238, 0.75)',
+                        background: isLightMode ? 'rgba(37, 99, 235, 0.08)' : 'rgba(14, 165, 233, 0.12)',
+                        color: themeButtonText,
                         padding: '12px 14px',
                         fontWeight: 700,
                         letterSpacing: '0.06em',
@@ -934,11 +996,11 @@ export default function App() {
               </div>
             </div>
           ) : null}
-          <div style={legendStyle}>
-            <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10, color: '#f8fafc'}}>Legend</div>
+          <div style={themedLegendStyle}>
+            <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10, color: themeTextColor}}>Legend</div>
             <div style={{display: 'grid', gap: 12}}>
               <div>
-                <div style={{fontSize: 11, color: '#94a3b8', marginBottom: 6}}>Signal color</div>
+                <div style={{fontSize: 11, color: themeCaptionColor, marginBottom: 6}}>Signal color</div>
                 <div style={{display: 'flex', gap: 6, alignItems: 'center'}}>
                   {signalLegendStops.map(value => {
                     const color = getWifiColor({bestSignal: value});
@@ -951,49 +1013,49 @@ export default function App() {
                           height: 20,
                           background: `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3] / 255})`,
                           borderRadius: 6,
-                          border: '1px solid rgba(255,255,255,0.12)'
+                          border: isLightMode ? '1px solid rgba(148, 163, 184, 0.35)' : '1px solid rgba(255,255,255,0.12)'
                         }}
                       />
                     );
                   })}
                 </div>
-                <div style={{fontSize: 11, color: '#94a3b8', marginTop: 6}}>Color maps from low (cold) to high (warm) signal.</div>
+                <div style={{fontSize: 11, color: themeCaptionColor, marginTop: 6}}>Color maps from low (cold) to high (warm) signal.</div>
               </div>
               <div>
-                <div style={{fontSize: 11, color: '#94a3b8', marginBottom: 6}}>Height</div>
-                <div style={{fontSize: 11, color: '#cbd5e1'}}>Hexagon height is normalized by network count, max count is {maxNetworkCount}.</div>
+                <div style={{fontSize: 11, color: themeCaptionColor, marginBottom: 6}}>Height</div>
+                <div style={{fontSize: 11, color: themeTextColor}}>Hexagon height is normalized by network count, max count is {maxNetworkCount}.</div>
               </div>
             </div>
           </div>
 
-          <div style={legendStyle}>
-            <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10, color: '#f8fafc'}}>Insights</div>
+          <div style={themedLegendStyle}>
+            <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10, color: themeTextColor}}>Insights</div>
             <div style={{display: 'grid', gap: 12}}>
               <div style={{display: 'grid', gap: 4}}>
-                <div style={{fontSize: 11, color: '#94a3b8'}}>Total h3:11 hexagons</div>
-                <div style={{fontSize: 18, fontWeight: 700, color: '#7dd3fc'}}>{wifiHexagons.length}</div>
+                <div style={{fontSize: 11, color: themeCaptionColor}}>Total h3:11 hexagons</div>
+                <div style={{fontSize: 18, fontWeight: 700, color: themeAccent}}>{wifiHexagons.length}</div>
               </div>
               <div style={{display: 'grid', gap: 4}}>
-                <div style={{fontSize: 11, color: '#94a3b8'}}>Total networks found</div>
-                <div style={{fontSize: 18, fontWeight: 700, color: '#7dd3fc'}}>{wifiHexagons.reduce((sum, hexagon) => sum + hexagon.networkCount, 0)}</div>
+                <div style={{fontSize: 11, color: themeCaptionColor}}>Total networks found</div>
+                <div style={{fontSize: 18, fontWeight: 700, color: themeAccent}}>{wifiHexagons.reduce((sum, hexagon) => sum + hexagon.networkCount, 0)}</div>
               </div>
               <div style={{display: 'grid', gap: 4}}>
-                <div style={{fontSize: 11, color: '#94a3b8'}}>Last refresh</div>
-                <div style={{fontSize: 14, color: '#dbeafe'}}>{lastUpdated ? lastUpdated.toLocaleTimeString() : 'Waiting...'}</div>
+                <div style={{fontSize: 11, color: themeCaptionColor}}>Last refresh</div>
+                <div style={{fontSize: 14, color: themeTextColor}}>{lastUpdated ? lastUpdated.toLocaleTimeString() : 'Waiting...'}</div>
               </div>
             </div>
           </div>
 
-          <div style={legendStyle}>
-            <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10, color: '#f8fafc'}}>Update history</div>
+          <div style={themedLegendStyle}>
+            <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10, color: themeTextColor}}>Update history</div>
             <div style={{display: 'flex', gap: 10, alignItems: 'flex-end', minHeight: 96}}>
               {updateHistory.map((entry, index) => {
                 const maxCount = Math.max(1, updateHistory[0]?.count || 1);
                 const height = Math.min(96, Math.max(18, (entry.count / maxCount) * 96));
                 return (
                   <div key={`${entry.time}-${index}`} style={{display: 'grid', alignItems: 'end', gap: 4, width: 36}}>
-                    <div style={{height: `${height}px`, background: 'linear-gradient(180deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.6))', borderRadius: 10}} />
-                    <div style={{fontSize: 10, color: '#94a3b8', textAlign: 'center'}}>{new Date(entry.time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
+                    <div style={{height: `${height}px`, background: isLightMode ? 'linear-gradient(180deg, rgba(37,99,235,0.95), rgba(59,130,246,0.6))' : 'linear-gradient(180deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.6))', borderRadius: 10}} />
+                    <div style={{fontSize: 10, color: themeCaptionColor, textAlign: 'center'}}>{new Date(entry.time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
                   </div>
                 );
               })}
