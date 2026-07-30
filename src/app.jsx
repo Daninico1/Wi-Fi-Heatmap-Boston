@@ -7,7 +7,6 @@ import {createRoot} from 'react-dom/client';
 import {DeckGL} from '@deck.gl/react';
 import {MapView} from '@deck.gl/core';
 import {H3HexagonLayer} from '@deck.gl/geo-layers';
-import {HeatmapLayer} from '@deck.gl/aggregation-layers';
 import maplibregl from 'maplibre-gl';
 
 import {Map} from 'react-map-gl/maplibre';
@@ -37,9 +36,6 @@ const MAX_ELEVATION_SCALE = 360;
 
 // probably want to change this to be faster for the presentation
 const AUTO_ROTATE_SPEED = 0.04;
-
-// could probably change this to see the streets better
-const HEATMAP_OPACITY = 0.48;
 
 // Configurable data URL (set VITE_WIFI_DATA_URL in env to override)
 // Will need to fix this for deployment
@@ -194,8 +190,6 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showLayer, setShowLayer] = useState(true);
-  const [showHeatmap, setShowHeatmap] = useState(false);
-  const [heatmapMode, setHeatmapMode] = useState('signal');
   const [filterSSID, setFilterSSID] = useState('');
   const [filterEncryption, setFilterEncryption] = useState('All');
   const [theme, setTheme] = useState('dark');
@@ -349,52 +343,6 @@ export default function App() {
 
   const displayedHexagons = filteredHexagons.length > 0 ? filteredHexagons : wifiHexagons;
   const showFallbackNotice = filteredHexagons.length === 0 && wifiHexagons.length > 0;
-
-  const heatmapPoints = useMemo(() => {
-    if (!showHeatmap) {
-      return [];
-    }
-
-    return displayedHexagons.flatMap(hexagon =>
-      hexagon.networks.flatMap(network =>
-        Array.isArray(network.records)
-          ? network.records.map(record => ({
-              position: [record.lng, record.lat],
-              weight: heatmapMode === 'signal'
-                ? clamp((record['dBm'] - SIGNAL_MIN) / (SIGNAL_MAX - SIGNAL_MIN), 0, 1)
-                : 1
-            }))
-          : []
-      )
-    );
-  }, [displayedHexagons, heatmapMode, showHeatmap]);
-
-  const heatmapLayer = useMemo(() => {
-    if (!showHeatmap) {
-      return null;
-    }
-
-    return new HeatmapLayer({
-      id: 'wifi-heatmap',
-      data: heatmapPoints,
-      getPosition: d => d.position,
-      getWeight: d => d.weight,
-      radiusPixels: 90,
-      intensity: 1,
-      threshold: 0.2,
-      colorRange: [
-        [33, 102, 172],
-        [67, 147, 195],
-        [146, 197, 222],
-        [209, 229, 240],
-        [253, 219, 199],
-        [244, 165, 130],
-        [214, 96, 77],
-        [178, 24, 43]
-      ],
-      opacity: 0.8
-    });
-  }, [heatmapPoints, showHeatmap]);
 
   const wifiLayer = useMemo(() => {
     if (!showLayer) {
@@ -558,7 +506,7 @@ export default function App() {
           keyboard: true
         }}
         views={MAP_VIEW}
-        layers={[heatmapLayer, wifiLayer, selectedHexagonLayer].filter(Boolean)}
+        layers={[wifiLayer, selectedHexagonLayer].filter(Boolean)}
         onViewStateChange={onViewStateChange}
         onClick={info => {
           if (info.object) {
@@ -636,18 +584,8 @@ export default function App() {
             </label>
 
             <label className="control-label">
-              <span>Show heatmap overlay</span>
-              <input
-                type="checkbox"
-                checked={showHeatmap}
-                onChange={evt => setShowHeatmap(evt.target.checked)}
-                className="control-checkbox"
-              />
-            </label>
-
-            <label className="control-label">
-              <span>Heatmap mode</span>
-              <select value={heatmapMode} onChange={evt => setHeatmapMode(evt.target.value)} className="control-select">
+              <span>Base display mode</span>
+              <select value={displayMode} onChange={evt => setDisplayMode(evt.target.value)} className="control-select">
                 <option value="signal">Signal</option>
                 <option value="density">Density</option>
               </select>
