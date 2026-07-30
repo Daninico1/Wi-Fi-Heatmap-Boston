@@ -591,13 +591,13 @@ export default function App() {
               </select>
             </label>
 
-            <label className="control-label">
+            {/* <label className="control-label">
               <span>Base display mode</span>
               <select value={displayMode} onChange={evt => setDisplayMode(evt.target.value)} className="control-select">
                 <option value="signal">Signal</option>
                 <option value="density">Density</option>
               </select>
-            </label>
+            </label> */}
 
             <label className="control-label">
               <span>Security filter</span>
