@@ -32,8 +32,6 @@ export default class H3GridLayer extends CompositeLayer {
           getHexagon: d => d,
           highPrecision: tile.hasMultipleFaces,
           centerHexagon: tile.centerHexagon
-          // uncomment to debug
-          // getFillColor: getTileColor(tile)
         });
       },
       updateTriggers: {
@@ -45,10 +43,3 @@ export default class H3GridLayer extends CompositeLayer {
 
 H3GridLayer.layerName = 'H3GridLayer';
 H3GridLayer.defaultProps = defaultProps;
-
-// For debug. Generate some arbitrary color that differentiates neighboring tiles
-// function getTileColor({x, y, z}) {
-//   const n = x + y;
-//   const i = (n * (n - 1)) / 2 + (n % 2 ? y : x) + n + 1;
-//   return [(x * 107) % 255, (y * 107) % 255, Math.sin(i) * 128 + 128, 80];
-// }
