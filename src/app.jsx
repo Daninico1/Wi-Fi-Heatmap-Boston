@@ -206,6 +206,7 @@ export default function App() {
   const [displayMode, setDisplayMode] = useState('signal');
   const [encryptionTypes, setEncryptionTypes] = useState(['All']);
   const [autoRotateEnabled, setAutoRotateEnabled] = useState(true);
+  const [panelsVisible, setPanelsVisible] = useState(true);
   const [maxNetworkCount, setMaxNetworkCount] = useState(1);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [updateHistory, setUpdateHistory] = useState([]);
@@ -594,7 +595,16 @@ export default function App() {
         <Map mapLib={maplibregl} mapStyle={mapStyleUrl} />
       </DeckGL>
 
-      <section className="panel panel-left">
+      <button
+        type="button"
+        className="mobile-panel-toggle button button-soft"
+        onClick={() => setPanelsVisible(prev => !prev)}
+        aria-expanded={panelsVisible}
+      >
+        {panelsVisible ? 'Hide panels' : 'Show panels'}
+      </button>
+
+      <section className={`panel panel-left ${panelsVisible ? '' : 'panel-hidden'}`}>
         <div className="panel-header">
           <div className="panel-title">Wi-Fi Map Boston</div>
           <div className="panel-subtitle">Live refresh every 30 seconds. Explore signal strength, network density, and encryption in a cyber grid.</div>
@@ -731,7 +741,7 @@ export default function App() {
         </div>
       </section>
 
-      <aside className="panel panel-right">
+      <aside className={`panel panel-right ${panelsVisible ? '' : 'panel-hidden'}`}>
         <div className="panel-group">
           <div className="panel-section-title">Dashboard</div>
 
