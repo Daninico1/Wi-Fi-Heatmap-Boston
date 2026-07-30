@@ -206,6 +206,7 @@ export default function App() {
   const [displayMode, setDisplayMode] = useState('signal');
   const [encryptionTypes, setEncryptionTypes] = useState(['All']);
   const [autoRotateEnabled, setAutoRotateEnabled] = useState(true);
+  const [panelsVisible, setPanelsVisible] = useState(true);
   const [maxNetworkCount, setMaxNetworkCount] = useState(1);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [updateHistory, setUpdateHistory] = useState([]);
@@ -579,8 +580,6 @@ export default function App() {
             html: `<div style="font-size:13px; line-height:1.35; color:#FFFF;">
               <div><strong style="color:#FFFF;">Hexagon</strong>: ${info.object.hex}</div>
               <div><strong>Networks</strong>: ${info.object.networkCount}</div>
-              <div><strong>Records</strong>: ${info.object.recordCount}</div>
-              <div><strong>Average signal</strong>: ${info.object.averageSignal ?? 'N/A'} dBm</div>
               <div><strong>Best signal</strong>: ${info.object.bestSignal ?? 'N/A'} dBm</div>
               <div><strong>Top SSID</strong>: ${info.object.bestSSID}</div>
               <div><strong>BSSID</strong>: ${info.object.bestBssid}</div>
@@ -594,7 +593,16 @@ export default function App() {
         <Map mapLib={maplibregl} mapStyle={mapStyleUrl} />
       </DeckGL>
 
-      <section className="panel panel-left">
+      <button
+        type="button"
+        className="mobile-panel-toggle button button-soft"
+        onClick={() => setPanelsVisible(prev => !prev)}
+        aria-expanded={panelsVisible}
+      >
+        {panelsVisible ? 'Hide panels' : 'Show panels'}
+      </button>
+
+      <section className={`panel panel-left ${panelsVisible ? '' : 'panel-hidden'}`}>
         <div className="panel-header">
           <div className="panel-title">Wi-Fi Map Boston</div>
           <div className="panel-subtitle">Live refresh every 30 seconds. Explore signal strength, network density, and encryption in a cyber grid.</div>
@@ -731,7 +739,7 @@ export default function App() {
         </div>
       </section>
 
-      <aside className="panel panel-right">
+      <aside className={`panel panel-right ${panelsVisible ? '' : 'panel-hidden'}`}>
         <div className="panel-group">
           <div className="panel-section-title">Dashboard</div>
 
@@ -812,9 +820,9 @@ export default function App() {
                   <button type="button" className="button button-small button-outline" onClick={copySelectedInfo}>
                     Copy selected info
                   </button>
-                  <button type="button" className="button button-small button-outline" onClick={downloadSelectedCsv}>
+                  {/* <button type="button" className="button button-small button-outline" onClick={downloadSelectedCsv}>
                     Export selected CSV
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </section>
@@ -841,7 +849,7 @@ export default function App() {
                     );
                   })}
                 </div>
-                <div className="legend-label">Color maps from low (cold) to high (warm) signal.</div>
+                <div className="legend-label">Color maps from worse (red) to best (blue) signal.</div>
               </div>
               <div>
                 <div className="legend-label">Height</div>
@@ -861,14 +869,14 @@ export default function App() {
                 <span className="legend-label">Total networks found</span>
                 <span className="insight-value">{wifiHexagons.reduce((sum, hexagon) => sum + hexagon.networkCount, 0)}</span>
               </div>
-              <div className="detail-row">
+              {/* <div className="detail-row">
                 <span className="legend-label">Last refresh</span>
                 <span className="detail-value">{lastUpdated ? lastUpdated.toLocaleTimeString() : 'Waiting...'}</span>
-              </div>
+              </div> */}
             </div>
           </section>
 
-          <section className="legend">
+          {/* <section className="legend">
             <div className="legend-title">Update history</div>
             <div className="history-row" style={{display: 'flex', gap: 10, alignItems: 'flex-end', minHeight: 96}}>
               {updateHistory.map((entry, index) => {
@@ -890,7 +898,7 @@ export default function App() {
                 );
               })}
             </div>
-          </section>
+          </section> */}
         </div>
       </aside>
     </>
