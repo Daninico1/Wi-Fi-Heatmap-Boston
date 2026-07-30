@@ -822,9 +822,9 @@ export default function App() {
                   <button type="button" className="button button-small button-outline" onClick={copySelectedInfo}>
                     Copy selected info
                   </button>
-                  <button type="button" className="button button-small button-outline" onClick={downloadSelectedCsv}>
+                  {/* <button type="button" className="button button-small button-outline" onClick={downloadSelectedCsv}>
                     Export selected CSV
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </section>

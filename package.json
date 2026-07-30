@@ -6,7 +6,8 @@
   "scripts": {
     "start": "vite --open",
     "start-local": "vite --config ../../vite.config.local.mjs",
-    "build": "vite build"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "deck.gl": "^9.3.0",
