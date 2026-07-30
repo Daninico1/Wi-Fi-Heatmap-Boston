@@ -102,17 +102,19 @@ body {
 
 .mobile-panel-toggle {
   position: fixed;
-  bottom: 20px;
   left: 50%;
+  bottom: 20px;
   z-index: 2;
   width: calc(100% - 40px);
-  max-width: 320px;
+  max-width: 160px;
   font-size: 14px;
   padding: 14px 18px;
-}
-
-.mobile-panel-toggle:hover {
-  transform: translateX(-50%) translateY(-1px);
+  background: rgb(14, 165, 233);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+  transform: translateX(-50%);
 }
 
 .panel-hidden {
@@ -175,6 +177,7 @@ body {
 @media (min-width: 901px) {
   .mobile-panel-toggle {
     display: none;
+    background: rgba(14, 165, 233, 1)
   }
 }
 
@@ -262,6 +265,9 @@ body {
   transform: translateY(-1px);
 }
 
+.mobile-panel-toggle:hover {
+  transform: translateX(-50%);
+}
 .button-small {
   padding: 12px 14px;
   letter-spacing: 0.06em;
